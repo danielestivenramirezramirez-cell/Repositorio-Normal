@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- BANNER INSTITUCIONAL -->
+<div class="hero-banner shadow-sm mb-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap position-relative" style="z-index: 1;">
+        <div class="d-flex align-items-center gap-3">
+            <div class="institutional-identity">
+                <img src="{{ url_for('static', filename='images/escudo-institucional.png') }}" alt="Escudo institucional ENSCM" class="identity-crest">
+                <img src="{{ url_for('static', filename='images/mascota-normalista.png') }}" alt="Mascota normalista ENSCM" class="identity-mascot">
+            </div>
+            <div>
+            <span class="badge bg-warning text-dark mb-2 px-3 py-1 rounded-pill fw-semibold">
+                <i class="bi bi-shield-check me-1"></i> Repositorio Digital Institucional
+            </span>
+            <h1 class="h2 fw-bold mb-1">Escuela Normal Superior Claudina Múnera</h1>
+            <p class="mb-0 text-white-50">Plataforma centralizada de gestión, preservación y consulta de documentos académicos.</p>
+            </div>
+        </div>
+        <div class="mt-3 mt-md-0">
+            <form action="{{ url_for('generar_backup') }}" method="POST">
+                <button type="submit" class="btn btn-light btn-sm text-dark font-weight-bold px-3 py-2 shadow-sm rounded-3">
+                    <i class="bi bi-database-fill-check text-success me-1"></i> Respaldar Base de Datos
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- TARJETAS DE MÉTRICAS / KPIS -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card kpi-card p-3" style="border-left-color: var(--color-primario);">
+            <div class="d-flex align-items-center">
+                <div class="bg-primary bg-opacity-10 p-3 rounded-circle me-3">
+                    <i class="bi bi-file-earmark-text text-primary fs-3"></i>
+                </div>
+                <div>
+                    <span class="text-muted small">Total Documentos</span>
+                    <h3 class="fw-bold mb-0">{{ files|length }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card kpi-card p-3" style="border-left-color: var(--color-acento);">
+            <div class="d-flex align-items-center">
+                <div class="bg-warning bg-opacity-10 p-3 rounded-circle me-3">
+                    <i class="bi bi-folder text-warning fs-3"></i>
+                </div>
+                <div>
+                    <span class="text-muted small">Colecciones</span>
+                    <h3 class="fw-bold mb-0">{{ collections|length }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card kpi-card p-3" style="border-left-color: var(--color-secundario);">
+            <div class="d-flex align-items-center">
+                <div class="bg-success bg-opacity-10 p-3 rounded-circle me-3">
+                    <i class="bi bi-hdd text-success fs-3"></i>
+                </div>
+                <div>
+                    <span class="text-muted small">Almacenamiento Usado</span>
+                    <h3 class="fw-bold mb-0">{{ storage_mb }} MB</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- BARRA DE BÚSQUEDA -->
+<div class="card card-custom p-3 mb-4">
+    <form action="/" method="GET" class="row g-2 align-items-center">
+        <div class="col-md-10">
+            <div class="input-group">
+                <span class="input-group-text bg-light border-0"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" name="q" class="form-control border-0 bg-light" placeholder="Buscar por título, palabra clave o etiquetas..." value="{{ q }}">
+            </div>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-enscm-primary w-100">
+                Buscar
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- PANEL SUBIR ARCHIVO -->
+<div class="card card-custom mb-4">
+    <div class="card-header bg-white py-3 border-0 d-flex align-items-center">
+        <i class="bi bi-cloud-arrow-up-fill text-primary me-2 fs-5"></i>
+        <h5 class="card-title fw-bold mb-0">Cargar Nuevo Documento</h5>
+    </div>
+    <div class="card-body pt-0">
+        <form action="{{ url_for('subir_archivo') }}" method="POST" enctype="multipart/form-data" class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label small text-muted fw-semibold">Seleccionar Archivo</label>
+                <input class="form-control" type="file" name="archivo" required>
+                <small class="text-muted d-block mt-1">Tamaño máximo: 100 MB.</small>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small text-muted fw-semibold">Colección Destino</label>
+                <select class="form-select" name="collection_id" required>
+                    {% for col in collections %}
+                        <option value="{{ col.id }}">{{ col.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small text-muted fw-semibold">Visibilidad</label>
+                <select class="form-select" name="visibility">
+                    <option value="publico">Público</option>
+                    <option value="institucion">Institucional</option>
+                    <option value="privado">Privado</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small text-muted fw-semibold">Etiquetas</label>
+                <input type="text" name="tags" class="form-control" placeholder="Ej: Guía, 2026, Acta">
+            </div>
+            <div class="col-12 text-end mt-3">
+                <button type="submit" class="btn btn-enscm-success px-4">
+                    <i class="bi bi-upload me-1"></i> Subir al Repositorio
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <!-- PANEL SECCIÓN DE COLECCIONES -->
+    <div class="col-lg-4 mb-4">
+        <div class="card card-custom h-100">
+            <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
+                <h5 class="card-title fw-bold mb-0">
+                    <i class="bi bi-folder-fill text-warning me-2"></i>Colecciones
+                </h5>
+                <button class="btn btn-sm btn-outline-primary rounded-pill" type="button" data-bs-toggle="collapse" data-bs-target="#nuevaCarpetaForm">
+                    <i class="bi bi-plus-lg"></i> Crear
+                </button>
+            </div>
+
+            <!-- FORMULARIO COLAPSIBLE NUEVA COLECCIÓN -->
+            <div class="collapse p-3 border-bottom bg-light" id="nuevaCarpetaForm">
+                <form action="{{ url_for('crear_coleccion') }}" method="POST">
+                    <div class="mb-2">
+                        <input type="text" name="nombre" class="form-control form-control-sm" placeholder="Nombre de la colección" required>
+                    </div>
+                    <div class="mb-2">
+                        <input type="text" name="descripcion" class="form-control form-control-sm" placeholder="Descripción breve">
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-enscm-primary w-100">Guardar Colección</button>
+                </form>
+            </div>
+
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    {% for col in collections %}
+                        <li class="list-group-item border-0 border-bottom p-3 d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1 fw-semibold text-dark">{{ col.name }}</h6>
+                                <small class="text-muted d-block">{{ col.description }}</small>
+                            </div>
+                            <form action="{{ url_for('eliminar_coleccion', collection_id=col.id) }}" method="POST" onsubmit="return confirm('¿Seguro que deseas borrar esta colección?');">
+                                <button type="submit" class="btn btn-sm text-danger btn-light rounded-circle" title="Eliminar Colección">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANEL TABLA DE ARCHIVOS -->
+    <div class="col-lg-8 mb-4">
+        <div class="card card-custom h-100">
+            <div class="card-header bg-white py-3 border-0">
+                <h5 class="card-title fw-bold mb-0">
+                    <i class="bi bi-file-earmark-text-fill text-primary me-2"></i>Archivos Registrados
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-custom align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th class="ps-3">Nombre del Archivo</th>
+                                <th>Colección</th>
+                                <th>Permisos</th>
+                                <th class="text-end pe-3">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for file in files %}
+                                <tr>
+                                    <td class="ps-3">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-file-earmark-pdf-fill text-danger fs-4 me-2"></i>
+                                            <div>
+                                                <div class="fw-semibold text-dark">{{ file.original_name }}</div>
+                                                {% if file.tags %}
+                                                    <span class="badge badge-soft-info"><i class="bi bi-tag-fill me-1"></i>{{ file.tags }}</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge bg-light text-dark border">{{ file.collection_name }}</span></td>
+                                    <td>
+                                        {% if file.visibility == 'publico' %}
+                                            <span class="badge badge-soft-success">Público</span>
+                                        {% elif file.visibility == 'institucion' %}
+                                            <span class="badge badge-soft-warning">Institucional</span>
+                                        {% else %}
+                                            <span class="badge badge-soft-danger">Privado</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end pe-3">
+                                        <a href="{{ url_for('descargar_archivo', file_id=file.id) }}" class="btn btn-sm btn-light text-primary me-1 rounded-circle" title="Descargar">
+                                            <i class="bi bi-download"></i>
+                                        </a>
+                                        <form action="{{ url_for('eliminar_archivo', file_id=file.id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Eliminar este archivo?');">
+                                            <button type="submit" class="btn btn-sm btn-light text-danger rounded-circle" title="Eliminar">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted py-5">
+                                        <i class="bi bi-inbox fs-1 d-block text-black-50 mb-2"></i>
+                                        No se encontraron archivos cargados.
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

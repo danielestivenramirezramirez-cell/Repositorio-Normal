@@ -1,0 +1,14 @@
+REPOSITORIO DIGITAL INSTITUCIONAL - ENSCM
+
+1. Descomprime esta carpeta completa en una ubicación sencilla, por ejemplo C:\Repositorio_ENSCM.
+2. Abre esa carpeta en VS Code. Debes ver main.py directamente en el primer nivel, junto a datos, static y templates.
+3. Cierra cualquier servidor anterior: en cada terminal donde Flask esté activo, pulsa CTRL+C.
+4. Ejecuta iniciar_repositorio.bat o abre una terminal en esta carpeta y ejecuta: python main.py
+5. Abre http://127.0.0.1:5000
+
+IMPORTANTE:
+- No ejecutes el main.py de una carpeta antigua ni abras otra copia del proyecto.
+- No borres datos/rdi.db ni la carpeta datos/archivos: contienen la base de datos y los documentos.
+- Las imágenes institucionales están en static/images/.
+- Para comprobarlas, abre /static/images/escudo-institucional.png y /static/images/mascota-normalista.png.
+- Se recomienda mantener un solo servidor Flask abierto para evitar bloqueos de SQLite.
